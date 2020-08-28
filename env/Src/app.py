@@ -4,7 +4,7 @@ try:
 except:
     from controller import *
     from Objects.ESP_room_1 import *
-    
+
 if len(argv) > 1:
     if argv[1] == '--new-db':
         db.create_all()
@@ -40,8 +40,16 @@ def add_data():
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
-    data = dict(topic=message.topic, payload=message.payload.decode())
-    print('hello', data)
-
+    try:
+        data = str(message.payload.decode()).split(' ')
+        date = time.asctime(time.localtime())
+        sensor_1 = data[0] # light sensor
+        sensor_2 = data[1] # temperature sensor
+        device_1 = data[2] # device used by house members   
+        new_reading = ESP_room_1(date, sensor_1, sensor_2, device_1)
+        db.session.add(new_reading)
+        db.session.commit() 
+    except Exception as e:
+        print(str(e))
 if __name__ == '__main__':
     app.run(debug=True)
