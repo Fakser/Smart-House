@@ -1,5 +1,7 @@
-from Src.controller import *
-
+try:
+    from Src.controller import *
+except:
+    from controller import *
 class ESP_room_1(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     date = db.Column(db.String(100))

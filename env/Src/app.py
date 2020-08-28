@@ -1,6 +1,10 @@
-from Src.controller import *
-from Src.Objects.ESP_room_1 import *
-
+try:    
+    from Src.controller import *
+    from Src.Objects.ESP_room_1 import *
+except:
+    from controller import *
+    from Objects.ESP_room_1 import *
+    
 if len(argv) > 1:
     if argv[1] == '--new-db':
         db.create_all()
