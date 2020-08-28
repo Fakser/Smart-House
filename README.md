@@ -1,10 +1,9 @@
 # Smart-house-REST-API
 
-setting up new server:
-$ pip install virtualenv
-$ ./env/Scripts/activate
-$ python ./Src/app.py --new-db
+setting up new server:<br/>
+$ ./env/Scripts/activate<br/>
+$ python ./Src/app.py --new-db<br/>
 
-running existing server:
-$ ./env/Scripts/activate
-$ python ./Src/app.py
+running existing server:<br/>
+$ ./env/Scripts/activate<br/>
+$ python ./Src/app.py<br/>
