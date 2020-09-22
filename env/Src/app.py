@@ -1,55 +1,76 @@
 try:    
     from Src.controller import *
-    from Src.Objects.ESP_room_1 import *
 except:
     from controller import *
-    from Objects.ESP_room_1 import *
 
 if len(argv) > 1:
     if argv[1] == '--new-db':
-        db.create_all()
+        table_names, message = db.get_list_of_table_names()
+        for name in table_names:
+            db.drop_table(name[0])
+
 
 @app.route('/data', methods = ['GET'])
 def get_data():
-    """
-    Endpoint that returns all data in database
-    """
-    return jsonify(esp_room_1_schema_multiple.dump(ESP_room_1.query.all())), "200"
+    table_names, message = db.get_list_of_table_names()
+    if not table_names:
+        return str(message), "500"
+    data = {}
+    for name in table_names:
+        data_from_table, message = db.select_all_from_table(name[0])
+        if not data_from_table:
+            return str(message), "500"
+        data[str(name[0])] = deepcopy(data_from_table)
 
+    return str(json.dumps(data)), "200"
 
-@app.route('/data', methods = ['POST'])
-def add_data():
-    """
-    Endpoint that returns all data in database
-    """
-    try:
-        date = request.json['date']
-        sensor_1 = request.json['sensor_1']
-        sensor_2 = request.json['sensor_2']
-        device_1 = request.json['device_1']
-    except:
-        return "key error, proper keys not found", "404"
-    try:    
-        new_reading = ESP_room_1(date, sensor_1, sensor_2, device_1)
-        db.session.add(new_reading)
-        db.session.commit()
-    except Exception as e:
-        return str(e), "500"
-    return jsonify(esp_room_1_schema.dump(new_reading)), '200' 
+@app.route('/data', methods = ['GET'])
+def get_tails():
+    table_names, message = db.get_list_of_table_names()
+    if not table_names:
+        return str(message), "500"
+    data = {}
+    for name in table_names:
+        data_from_table, message = db.select_tail(name[0])
+        if not data_from_table:
+            return str(message), "500"
+        data[str(name[0])] = deepcopy(data_from_table)
+
+    return str(json.dumps(data)), "200"
+
+@app.route('/data/<name>', methods = ['DELETE'])
+def delete_table(name):
+    boolean, message = db.drop_table(name)
+    if not boolean:
+        return str(message), "500"
+    return "Success", "200"
+
 
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     try:
-        data = str(message.payload.decode()).split(' ')
+        data_from_topic = str(message.payload.decode()).split(' ')
         date = time.asctime(time.localtime())
-        sensor_1 = data[0] # light sensor
-        sensor_2 = data[1] # temperature sensor
-        device_1 = data[2] # device used by house members   
-        new_reading = ESP_room_1(date, sensor_1, sensor_2, device_1)
-        db.session.add(new_reading)
-        db.session.commit() 
+        data = [date] 
+        columns = ['date']
+        table_name = str(message.topic)
+        for index, record in enumerate(data_from_topic):
+            if index % 2 == 0:
+                columns.append(record)
+            else:
+                data.append(record)
+        table_names, error_message = db.get_list_of_table_names()
+        if not table_names:
+            return str(error_message), "500"
+        if table_name not in [str(name[0]) for name in table_names]:
+            db.create_table(table_name, columns)
+            print('created table ' + table_name)
+        db.insert_record_into_table(table_name, data)
     except Exception as e:
         print(str(e))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+
