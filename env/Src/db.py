@@ -27,6 +27,14 @@ def create_table(name, columns):
     return True, "Table added successfully"
 
 def select_all_from_table(name):
+    """Function returning all records from table given by name
+
+    Args:
+        name (string): name of the table 
+
+    Returns:
+        (tuple): first element of the tuple is either a bool (False), or a list 
+    """
     try:
         connection = sqlite3.connect('sensors_data.db')
     except Exception as e:
