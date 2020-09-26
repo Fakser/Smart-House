@@ -24,14 +24,14 @@ def get_data():
 
     return str(json.dumps(data)), "200"
 
-@app.route('/data', methods = ['GET'])
-def get_tails():
+@app.route('/data/<size>', methods = ['GET'])
+def get_tails(size):
     table_names, message = db.get_list_of_table_names()
     if not table_names:
         return str(message), "500"
     data = {}
     for name in table_names:
-        data_from_table, message = db.select_tail(name[0])
+        data_from_table, message = db.select_tail(name[0], int(size))
         if not data_from_table:
             return str(message), "500"
         data[str(name[0])] = deepcopy(data_from_table)
