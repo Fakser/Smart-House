@@ -1,5 +1,12 @@
 # Smart-house-REST-API
 
+## Requierments
+Flask
+Flask-MQTT
+Streamlit
+plotly
+
+
 ## Windows
 ### Setting up new server:<br/>
 $ ./env/Scripts/activate<br/>
