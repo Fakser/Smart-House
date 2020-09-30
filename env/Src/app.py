@@ -42,8 +42,10 @@ def get_tails(size, token):
 
     return str(json.dumps(data)), "200"
 
-@app.route('/data/<name>', methods = ['DELETE'])
-def delete_table(name):
+@app.route('/data/<name>/<token>', methods = ['DELETE'])
+def delete_table(name, token):
+    if token != api_token:
+        return "unathorized connection"
     boolean, message = db.drop_table(name)
     if not boolean:
         return str(message), "500"
