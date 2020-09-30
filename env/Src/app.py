@@ -10,8 +10,10 @@ if len(argv) > 1:
             db.drop_table(name[0])
 
 
-@app.route('/data', methods = ['GET'])
-def get_data():
+@app.route('/data/<token>', methods = ['GET'])
+def get_data(token):
+    if token != api_token:
+        return "unathorized connection"
     table_names, message = db.get_list_of_table_names()
     # if not table_names:
     #     return str(message), "500"
@@ -24,8 +26,10 @@ def get_data():
 
     return str(json.dumps(data)), "200"
 
-@app.route('/data/<size>', methods = ['GET'])
-def get_tails(size):
+@app.route('/data/<size>/<token>', methods = ['GET'])
+def get_tails(size, token):
+    if token != api_token:
+        return "unathorized connection"
     table_names, message = db.get_list_of_table_names()
     # if not table_names:
     #     return str(message), "500"
@@ -72,5 +76,5 @@ def handle_mqtt_message(client, userdata, message):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
 

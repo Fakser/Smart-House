@@ -25,6 +25,7 @@ app.config['MQTT_TLS_ENABLED'] = False  # set TLS to disabled for testing purpos
 # @mqtt.on_connect()
 # def handle_connect(client, userdata, flags, rc):
 
+api_token = '6ytwk4ivTB7QkmlL0QPA1HNQ7NCOAb6Y'
 
 try:
     mqtt = Mqtt(app)
