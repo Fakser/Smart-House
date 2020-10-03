@@ -26,6 +26,22 @@ def create_table(name, columns):
         return False, e
     return True, "Table added successfully"
 
+def get_column_names(name):
+    try:
+        connection = sqlite3.connect('sensors_data.db')
+    except Exception as e:
+        print(e)
+    cursor = connection.cursor()
+    try:
+        cursor.execute("pragma table_info('" + name + "')")
+        names = cursor.fetchall()
+    except Exception as e:
+        return False, e    
+    connection.close()
+    return [name[1] for name in names], 'Success'
+
+
+
 def select_all_from_table(name):
     """Function returning all records from table given by name
 

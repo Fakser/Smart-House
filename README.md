@@ -1,10 +1,10 @@
 # Smart-house-REST-API
 
 ## Requierments
-Flask
-Flask-MQTT
-Streamlit
-plotly
+Flask <br/>
+Flask-MQTT <br/>
+Streamlit <br/>
+plotly <br/>
 
 
 ## Windows
