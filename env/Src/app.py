@@ -18,7 +18,7 @@ def get_data(token):
     for name in table_names:
         column_names = db.get_column_names(name[0])
         data_from_table, message = db.select_all_from_table(name[0])
-        data[str(name[0])] = deepcopy({col_name: data for col_name, data in zip(column_names, data_from_table)})
+        data[str(name[0])] = deepcopy([{col_name: data for col_name, data in list(zip(column_names, data_row))} for data_row in data_from_table])
 
     return str(json.dumps(data)), "200"
 
@@ -31,7 +31,7 @@ def get_tails(size, token):
     for name in table_names:
         column_names = db.get_column_names(name[0])
         data_from_table, message = db.select_tail(name[0], int(size))
-        data[str(name[0])] = deepcopy({col_name: data for col_name, data in zip(column_names, data_from_table)})
+        data[str(name[0])] = deepcopy([{col_name: data for col_name, data in list(zip(column_names, data_row))} for data_row in data_from_table])
 
     return str(json.dumps(data)), "200"
 
