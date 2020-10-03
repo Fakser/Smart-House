@@ -17,7 +17,9 @@ def get_data(token):
     data = {}
     for name in table_names:
         column_names = db.get_column_names(name[0])
+        print(column_names)
         data_from_table, message = db.select_all_from_table(name[0])
+        print(data_from_table)
         data[str(name[0])] = deepcopy([{col_name: data for col_name, data in tuple(zip(column_names, data_row))} for data_row in data_from_table])
 
     return str(json.dumps(data)), "200"
