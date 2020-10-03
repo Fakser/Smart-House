@@ -67,9 +67,10 @@ def handle_mqtt_message(client, userdata, message):
             else:
                 data.append(record)
         table_names, error_message = db.get_list_of_table_names()
-        if not table_names:
-            return str(error_message), "500"
+        # if not table_names:
+        #     return str(error_message), "500"
         if table_name not in [str(name[0]) for name in table_names]:
+            print(table_names)
             db.create_table(table_name, columns)
             print('created table ' + table_name)
         db.insert_record_into_table(table_name, data)
