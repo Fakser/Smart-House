@@ -73,9 +73,13 @@ class DataPreprocessor(object):
         data_dfs  = [deepcopy(self.data_df.iloc[i:-time_series_size + i].drop('date', axis = 1).reset_index(drop = True)) for i in reversed(range(time_series_size))]
         for df_index in range(len(data_dfs)):
             data_dfs[df_index].columns = [column + '_' + str(df_index) for column in data_dfs[df_index].columns]
-        X = pd.concat(data_dfs, axis = 1).iloc[:-forecast]
-        Y = self.data_df[[column for column in self.data_df.columns if y_rule in column]].iloc[time_series_size:-forecast]
-        return X, Y
+        if forecast:
+            X = pd.concat(data_dfs, axis = 1).iloc[:-forecast]
+            Y = self.data_df[[column for column in self.data_df.columns if y_rule in column]].iloc[time_series_size:-forecast]
+            return X, Y
+        else:
+            X = pd.concat(data_dfs, axis = 1)
+            return X, None
 
 
 
@@ -130,7 +134,7 @@ class AutoTuningHyperparameters(object):
         """
         model = self.model(**params)
         try:
-            model.fit(self.X_train, self.y_train)
+            model.fit(self.X_train.to_numpy(), self.y_train.to_numpy())
             predictions = model.predict(self.X_test)
             return model, self.cost(self.y_test, predictions)
         except Exception as e:
@@ -236,9 +240,9 @@ class AutoTuningHyperparameters(object):
             print('new search ranges for parameters: {}'.format(params))
 
             print('performed {} serach with max score of {} and best parameters {}'.format(search, score, best_params))
-        model = self.model(best_params)
-        model.fit(self.X_train, y_train)
-        return model, score
+        # model = self.model(best_params)
+        # model.fit(self.X_train, self.y_train)
+        return self.fit_model(best_params)  #model, score
 
 
     

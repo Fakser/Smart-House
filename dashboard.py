@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from controller import api_token
 
 
-data = get('http://8af6a61b778e.ngrok.io/data/8000/{}'.format(api_token)).json()
+data = get('http://localhost:5000/data/8000/{}'.format(api_token)).json()
 data_dfs = {key: pd.DataFrame(data[key]) for key in list(dict(data).keys())}
 st.title("Smart house data Dashboard")
 st.markdown('The dashboard will visualize the situation in smart house')
