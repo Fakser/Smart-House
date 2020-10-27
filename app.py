@@ -67,7 +67,7 @@ def use_all_models():
                         X.loc[0, x_column] = (X.loc[0, x_column] - ml_models[device_name + '_' + table_name]['standarization matrix'].loc['mean', standarization_column])/ml_models[device_name + '_' + table_name]['standarization matrix'].loc['std', standarization_column]
                         break
             print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, ml_models[device_name + '_' + table_name]['model'].predict(X)[0]))
-            # dodać wysyłanie po mqtt do urządzenia TODO
+            # dodać wysyłanie po mqtt do urządzenia https://flask-mqtt.readthedocs.io/en/latest/usage.html TODO
 
 job_use_models = cron.add_job(use_all_models, 'interval', minutes = 10)
 
