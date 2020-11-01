@@ -4,6 +4,7 @@
 DODAM KIEDYŚ
 
 ## Requierments
+sudo apt-get install libatlas-base-dev
 Flask <br/>
 Flask-MQTT <br/>
 Streamlit <br/>
