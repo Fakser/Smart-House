@@ -86,7 +86,7 @@ def use_all_models():
             print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, prediction))
             if mqtt:
                 mqtt.publish(topic = '{}/{}'.format(table_name, device_name), message = prediction)
-            # dodać wysyłanie po mqtt do urządzenia https://flask-mqtt.readthedocs.io/en/latest/usage.html TODO
+            
 
 job_use_models = cron.add_job(use_all_models, 'interval', minutes = MODEL_USAGE_INTERVAL)
 
@@ -117,7 +117,7 @@ job_train_models = cron.add_job(train_all_models, 'interval', hours = MODEL_LEAR
 
 atexit.register(lambda: cron.shutdown(wait=False))
 
-# http requests / dodać requesty do aplikacji użytkowej, zmienianie parametrów algorytmów ml itd
+
 @app.route('/data/<token>', methods = ['GET'])
 def get_data(token):
     if token != api_token:
