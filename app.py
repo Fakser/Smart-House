@@ -42,8 +42,8 @@ if len(argv) > 1:
             print('-mqtt-port             mqtt broker port                                                example usage: python app.py -mqtt-port 1885')
             print('-mqtt-url              mqtt broker url                                                 example usage: python app.py -mqtt-url 192.168.1.110')
             print('-ml-u                  time interval for using ml models in minutes                    example usage: python app.py -ml-u 10')
-            print('-ml-l                  time interval for learning ml models in hours                   example usage: python app.py -ml-u 24')
-            print('-tss                   size of the time series that ml model "see"                     example usage: python app.py -ml-u 3')
+            print('-ml-l                  time interval for learning ml models in hours                   example usage: python app.py -ml-l 24')
+            print('-tss                   size of the time series that ml model "see"                     example usage: python app.py -tss 3')
             print('-h                     help                                                            example usage: python app.py -h')
             exit()
 
@@ -56,7 +56,7 @@ app.config['MQTT_TLS_ENABLED'] = False  # set TLS to disabled for testing purpos
 
 # loading ml models
 try:
-    with open('./models/devices_rules', 'rb') as devices_rules_file:
+    with open('models/devices_rules', 'rb') as devices_rules_file:
         ml_models = pickle.load(devices_rules_file)
         print(ml_models)
 except Exception as e:
