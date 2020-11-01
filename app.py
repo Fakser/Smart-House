@@ -59,7 +59,8 @@ try:
     with open('./models/devices_rules', 'rb') as devices_rules_file:
         ml_models = pickle.load(devices_rules_file)
         print(ml_models)
-except:
+except Exception as e:
+    print(e)
     ml_models = {}
 
 XGB_PARAMS = { 'max_depth': [3, 300, 30]}
