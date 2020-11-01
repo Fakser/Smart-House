@@ -6,6 +6,12 @@ app = Flask(__name__)
 cron = BackgroundScheduler(daemon=True)
 cron.start()
 
+# STATIC CONST VARIABLES
+
+MODEL_USAGE_INTERVAL = 10
+MODEL_LEARNING_INTERVAL = 24
+TIME_SERIES_SIZE = 3
+
 mqtt_port = 1885
 mqtt_url = '192.168.1.110'
 
@@ -24,11 +30,20 @@ if len(argv) > 1:
             mqtt_port = int(argv[arg_index+1])
         if argv[arg_index] == '-mqtt-url' and arg_index < len(argv) - 1:
             mqtt_url = str(argv[arg_index+1])
+        if argv[arg_index] == '-ml-u' and arg_index < len(argv) - 1:
+            MODEL_USAGE_INTERVAL = int(argv[arg_index+1])
+        if argv[arg_index] == '-ml-l' and arg_index < len(argv) - 1:
+            MODEL_LEARNING_INTERVAL = int(argv[arg_index+1])
+        if argv[arg_index] == '-tss' and arg_index < len(argv) - 1:
+            TIME_SERIES_SIZE = int(argv[arg_index+1])
         if argv[arg_index] == '-h':
             print('--new-sensors-db       if provided, creates new database for sensors and devices       example usage: python app.py --new-sensors-db')
             print('--new-ml-db            if provided, creates new database for ml models                 example usage: python app.py --new-ml-db')
             print('-mqtt-port             mqtt broker port                                                example usage: python app.py -mqtt-port 1885')
             print('-mqtt-url              mqtt broker url                                                 example usage: python app.py -mqtt-url 192.168.1.110')
+            print('-ml-u                  time interval for using ml models in minutes                    example usage: python app.py -ml-u 10')
+            print('-ml-l                  time interval for learning ml models in hours                   example usage: python app.py -ml-u 24')
+            print('-tss                   size of the time series that ml model "see"                     example usage: python app.py -ml-u 3')
             print('-h                     help                                                            example usage: python app.py -h')
             exit()
 
@@ -46,6 +61,7 @@ try:
         print(ml_models)
 except:
     ml_models = {}
+
 XGB_PARAMS = { 'max_depth': [3, 300, 30]}
 
 # SCHEDULED TASK SEND TODO
@@ -60,16 +76,19 @@ def use_all_models():
         use = device[4]
         print(device_name, table_name, trainable, use)
         if use == 'false' and device_name + '_' + table_name in ml_models.keys():
-            X, _ = DataPreprocessor(data, standarization_rule='NO STANDARIZATION').time_series(forecast = None, y_rule=device_name)
+            X, _ = DataPreprocessor(data, standarization_rule='NO STANDARIZATION').time_series(time_series_size = TIME_SERIES_SIZE, forecast = None, y_rule=device_name)
             for x_column in X.columns:
                 for standarization_column in ml_models[device_name + '_' + table_name]['standarization matrix'].columns:
                     if standarization_column in x_column:
                         X.loc[0, x_column] = (X.loc[0, x_column] - ml_models[device_name + '_' + table_name]['standarization matrix'].loc['mean', standarization_column])/ml_models[device_name + '_' + table_name]['standarization matrix'].loc['std', standarization_column]
                         break
-            print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, ml_models[device_name + '_' + table_name]['model'].predict(X)[0]))
+            prediction =  ml_models[device_name + '_' + table_name]['model'].predict(X)[0]
+            print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, prediction))
+            if mqtt:
+                mqtt.publish(topic = '{}/{}'.format(table_name, device_name), message = prediction)
             # dodać wysyłanie po mqtt do urządzenia https://flask-mqtt.readthedocs.io/en/latest/usage.html TODO
 
-job_use_models = cron.add_job(use_all_models, 'interval', minutes = 10)
+job_use_models = cron.add_job(use_all_models, 'interval', minutes = MODEL_USAGE_INTERVAL)
 
 
 
@@ -85,7 +104,7 @@ def train_all_models():
         use = device[4]
         print(device_name, table_name, trainable, use)
         if trainable == 'true':
-            automl = AutoTuningHyperparameters(DecisionTreeClassifier, data, XGB_PARAMS, f1_score, forecast = 1, y_rule = device_name)
+            automl = AutoTuningHyperparameters(DecisionTreeClassifier, data, XGB_PARAMS, f1_score, time_series_size=TIME_SERIES_SIZE, forecast = 1, y_rule = device_name)
             model, score = automl.auto_tune_pipeline()
             print(score)
             ml_models[device_name + '_' + table_name] = {'model': model, 'score': score, 'standarization matrix': automl.data_preprocessor.standarization_matrix}
@@ -94,7 +113,7 @@ def train_all_models():
         pickle.dump(ml_models, devices_rules_file)
     print(ml_models)
 
-job_train_models = cron.add_job(train_all_models, 'interval', hours=12)
+job_train_models = cron.add_job(train_all_models, 'interval', hours = MODEL_LEARNING_INTERVAL)
 
 atexit.register(lambda: cron.shutdown(wait=False))
 
@@ -165,6 +184,7 @@ try:
             print(str(e))    
 except:
     print('unable to start mqtt server')
+    mqtt = None
 
 
 
