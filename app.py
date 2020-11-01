@@ -24,7 +24,7 @@ if len(argv) > 1:
         if argv[arg_index] == '--new-ml-db':
             table_names, message = db.get_list_of_table_names(database_name = 'ml.db')
             for name in table_names:
-                db.drop_table(name[0])
+                db.drop_table(name[0], database_name = 'ml.db')
             db.query_db('CREATE TABLE models (id INTEGER UNIQUE PRIMARY KEY, device_name STRING, table_name STRING, trainable STRING, use STRING)', database_name = 'ml.db')
         if argv[arg_index] == '-mqtt-port' and arg_index < len(argv) - 1:
             mqtt_port = int(argv[arg_index+1])
