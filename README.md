@@ -4,7 +4,9 @@
 DODAM KIEDYŚ
 
 ## Requierments
-sudo apt-get install libatlas-base-dev
+sudo apt-get install libatlas-base-dev <br/>
+Pandas <br/>
+Scikit-learn <br/>
 Flask <br/>
 Flask-MQTT <br/>
 Streamlit <br/>
