@@ -12,7 +12,6 @@ Flask-MQTT <br/>
 Streamlit <br/>
 plotly <br/>
 apscheduler <br/>
-atexit <br/>
 pickle-mixin <br/>
 
 ## Windows
