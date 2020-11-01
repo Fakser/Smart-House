@@ -4,12 +4,14 @@
 DODAM KIEDYŚ
 
 ## Requierments
+sudo apt-get install libatlas-base-dev <br/>
+Pandas <br/>
+Scikit-learn <br/>
 Flask <br/>
 Flask-MQTT <br/>
 Streamlit <br/>
 plotly <br/>
 apscheduler <br/>
-atexit <br/>
 pickle-mixin <br/>
 
 ## Windows
