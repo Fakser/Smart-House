@@ -159,32 +159,45 @@ def delete_table(name, token):
 try:
     mqtt = Mqtt(app)
     mqtt.subscribe('#')
+
     @mqtt.on_message()
     def handle_mqtt_message(client, userdata, message):
         try:
-            data_from_topic = str(message.payload.decode()).split(' ')
-            date = time.asctime(time.localtime())
-            data = [date] 
-            columns = ['date']
-            table_name = str(message.topic)
-            if 'control/' in table_name:
+            if 'control/' in str(message.topic):
                 return
-            for index, record in enumerate(data_from_topic):
-                if index % 2 == 0:
-                    columns.append(record)
-                else:
-                    data.append(record)
-            table_names, error_message = db.get_list_of_table_names()
-            if table_name not in [str(name[0]) for name in table_names]:
-                print(table_names)
-                db.create_table(table_name, columns)
-                print('created table ' + table_name)
-                for column in columns:
-                    if 'device' in column:
-                        db.query_db('INSERT INTO models (device_name, table_name, trainable, use) VALUES ("' + column + '","' + table_name + '", "false", "false");', database_name = 'ml.db')
-            db.insert_record_into_table(table_name, data)
+                
+            if 'data/' in str(message.topic):
+                data_from_topic = str(message.payload.decode()).split(' ')
+                date = time.asctime(time.localtime())
+                data = [date] 
+                columns = ['date']
+                table_name = str(message.topic).replace('data/', '')
+                for index, record in enumerate(data_from_topic):
+                    if index % 2 == 0:
+                        columns.append(record)
+                    else:
+                        data.append(record)
+                table_names, error_message = db.get_list_of_table_names()
+                if table_name not in [str(name[0]) for name in table_names]:
+                    print(table_names)
+                    db.create_table(table_name, columns)
+                    print('created table ' + table_name)
+                    for column in columns:
+                        if 'device' in column:
+                            db.query_db('INSERT INTO models (device_name, table_name, trainable, use) VALUES ("' + column + '","' + table_name + '", "false", "false");', database_name = 'ml.db')
+                db.insert_record_into_table(table_name, data)
+            
+            elif 'model/' in str(message.topic):
+                data_from_topic = str(message.payload.decode()).split(' ')
+                device_name = data_from_topic[0] 
+                table_name = data_from_topic[1]
+                train = data_from_topic[2]
+                use = data_from_topic[3]
+                db.query_db('INSERT INTO models (trainable, use) VALUES ("' + train +'", "'+ use +'") WHERE deice_name == "' + device_name + '" AND table_name == ' table_name '";', database_name = 'ml.db')
+
         except Exception as e:
             print(str(e))    
+
 except:
     print('unable to start mqtt server')
     mqtt = None
