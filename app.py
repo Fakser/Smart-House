@@ -69,7 +69,6 @@ ML_MODEL_PARAMS = { 'max_depth': [3, 300, 30],
 
 # SCHEDULED TASK SEND TODO
 def use_all_models():
-    print('ten minutes has passed, send data to all devices!')
     devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
     data = get('http://localhost:5000/data/4/{}'.format(api_token)).json()
     for device in devices:
@@ -97,9 +96,8 @@ job_use_models = cron.add_job(use_all_models, 'interval', minutes = MODEL_USAGE_
 
 # SCHEDULED TASK TRAIN TODO
 def train_all_models():
-    print('12 hours has passed, train!')
     devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
-    data = get('http://localhost:5000/data/10000/{}'.format(api_token)).json()
+    data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
     for device in devices:
         device_name = device[1]
         table_name = device[2]
