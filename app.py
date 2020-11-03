@@ -63,7 +63,9 @@ except Exception as e:
     print(e)
     ml_models = {}
 
-XGB_PARAMS = { 'max_depth': [3, 300, 30]}
+ML_MODEL_PARAMS = { 'max_depth': [3, 300, 30],
+               'min_samples_split': [0.1, 1, 0.1],
+               'min_samples_leaf': [0.1, 0.5, 0.1]}
 
 # SCHEDULED TASK SEND TODO
 def use_all_models():
@@ -76,7 +78,7 @@ def use_all_models():
         trainable = device[3]
         use = device[4]
         print(device_name, table_name, trainable, use)
-        if use == 'false' and device_name + '_' + table_name in ml_models.keys():
+        if use == 'true' and device_name + '_' + table_name in ml_models.keys():
             X, _ = DataPreprocessor(data, standarization_rule='NO STANDARIZATION').time_series(time_series_size = TIME_SERIES_SIZE, forecast = None, y_rule=device_name)
             for x_column in X.columns:
                 for standarization_column in ml_models[device_name + '_' + table_name]['standarization matrix'].columns:
@@ -105,7 +107,7 @@ def train_all_models():
         use = device[4]
         print(device_name, table_name, trainable, use)
         if trainable == 'true':
-            automl = AutoTuningHyperparameters(DecisionTreeClassifier, data, XGB_PARAMS, f1_score, time_series_size=TIME_SERIES_SIZE, forecast = 1, y_rule = device_name)
+            automl = AutoTuningHyperparameters(DecisionTreeClassifier, data, ML_MODEL_PARAMS, balanced_accuracy_score, time_series_size=TIME_SERIES_SIZE, forecast = 1, y_rule = device_name)
             model, score = automl.auto_tune_pipeline()
             print(score)
             ml_models[device_name + '_' + table_name] = {'model': model, 'score': score, 'standarization matrix': automl.data_preprocessor.standarization_matrix}
