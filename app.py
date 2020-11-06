@@ -193,7 +193,7 @@ try:
                 table_name = data_from_topic[1]
                 train = data_from_topic[2]
                 use = data_from_topic[3]
-                db.query_db('INSERT INTO models (trainable, use) VALUES ("' + train +'", "'+ use +'") WHERE deice_name == "' + device_name + '" AND table_name == ' + table_name + '";', database_name = 'ml.db')
+                db.query_db('INSERT INTO models (trainable, use) VALUES ("' + train +'", "'+ use +'") WHERE device_name == "' + device_name + '" AND table_name == "' + table_name + '";', database_name = 'ml.db')
 
         except Exception as e:
             print(str(e))    
