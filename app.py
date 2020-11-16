@@ -188,12 +188,11 @@ try:
                 db.insert_record_into_table(table_name, data)
             
             elif 'model/' in str(message.topic):
+                device_name, table_name = str(message.topic).replace('model/', '').split('/')
                 data_from_topic = str(message.payload.decode()).split(' ')
-                device_name = data_from_topic[0] 
-                table_name = data_from_topic[1]
                 train = data_from_topic[2]
                 use = data_from_topic[3]
-                db.query_db('UPDATE models Set trainable = ' + train +' , use '+ use + ' WHERE device_name = "' + device_name + '" AND table_name = "' + table_name + '";', database_name = 'ml.db')
+                db.query_db('UPDATE models Set trainable = "' + train + '" , use = "' + use + '" WHERE device_name = "' + device_name + '" AND table_name = "' + table_name + '";', database_name = 'ml.db')
 
         except Exception as e:
             print(str(e))    
