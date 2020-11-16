@@ -11,6 +11,7 @@ cron.start()
 MODEL_USAGE_INTERVAL = 10
 MODEL_LEARNING_INTERVAL = 24
 TIME_SERIES_SIZE = 3
+N_CLUSTERS = 3
 
 mqtt_port = 1885
 mqtt_url = '192.168.1.110'
@@ -36,6 +37,8 @@ if len(argv) > 1:
             MODEL_LEARNING_INTERVAL = int(argv[arg_index+1])
         if argv[arg_index] == '-tss' and arg_index < len(argv) - 1:
             TIME_SERIES_SIZE = int(argv[arg_index+1])
+        if argv[arg_index] == '-n-clusters' and arg_index < len(argv) - 1:
+            N_CLUSTERS = int(argv[arg_index+1])
         if argv[arg_index] == '-h':
             print('--new-sensors-db       if provided, creates new database for sensors and devices       example usage: python app.py --new-sensors-db')
             print('--new-ml-db            if provided, creates new database for ml models                 example usage: python app.py --new-ml-db')
@@ -44,6 +47,7 @@ if len(argv) > 1:
             print('-ml-u                  time interval for using ml models in minutes                    example usage: python app.py -ml-u 10')
             print('-ml-l                  time interval for learning ml models in hours                   example usage: python app.py -ml-l 24')
             print('-tss                   size of the time series that ml model "see"                     example usage: python app.py -tss 3')
+            print('-n-clusters            number of behaviour groups that clustering algorithm can find   example usage: python app.py -tss 3')
             print('-h                     help                                                            example usage: python app.py -h')
             exit()
 
@@ -69,13 +73,13 @@ try:
         print(behaviours)
 except Exception as e:
     print(e)
-    behaviours = {}
+    behaviours = {'n_clusters': N_CLUSTERS, 'model': None, 'columns': None}
 
 ML_MODEL_PARAMS = { 'max_depth': [3, 300, 30],
                'min_samples_split': [0.1, 1, 0.1],
                'min_samples_leaf': [0.1, 0.5, 0.1]}
 
-# SCHEDULED TASK SEND TODO
+# SCHEDULED TASK SEND 
 def use_all_models():
     devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
     data = get('http://localhost:5000/data/4/{}'.format(api_token)).json()
@@ -95,14 +99,14 @@ def use_all_models():
             prediction =  ml_models[device_name + '_' + table_name]['model'].predict(X)[0]
             print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, prediction))
             if mqtt:
-                mqtt.publish('control/{}/{}'.format(table_name, device_name), prediction)
+                mqtt.publish('control/{}/{}'.format(table_name, device_name), string(prediction))
             
 
 job_use_models = cron.add_job(use_all_models, 'interval', minutes = MODEL_USAGE_INTERVAL)
 
 
 
-# SCHEDULED TASK TRAIN TODO
+# SCHEDULED TASK TRAIN 
 def train_all_models():
     devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
     data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
@@ -123,6 +127,21 @@ def train_all_models():
     print(ml_models)
 
 job_train_models = cron.add_job(train_all_models, 'interval', hours = MODEL_LEARNING_INTERVAL)
+
+
+# SCHEDULED TASK TRAIN CLUSTERING
+def train_clustering():
+    data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
+    data_preprocessor = DataPreprocessor(data, standarization_rule=standarization_rule)
+    X, _ = data_preprocessor.time_series(time_series_size=TIME_SERIES_SIZE, forecast=None)
+    model = K_MEANS.model(X_train = X.to_numpy(), n_clusters=N_CLUSTERS)
+    model.fit(500, verbose = 0)
+    behaviours = {'n_clusters': N_CLUSTERS, 'model': model, 'columns': X.columns}
+    with open('./models/behaviours', 'wb') as behaviours_file:
+        pickle.dump(behaviours, behaviours_file)
+    print(behaviours, model.__centroids__(epoch = 'final'))
+
+job_train_clustering = cron.add_job(train_clustering, 'interval', hours = MODEL_LEARNING_INTERVAL)
 
 atexit.register(lambda: cron.shutdown(wait=False))
 
