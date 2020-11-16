@@ -63,6 +63,14 @@ except Exception as e:
     print(e)
     ml_models = {}
 
+try:
+    with open('models/behaviours', 'rb') as behaviours_file:
+        behaviours = pickle.load(behaviours_file)
+        print(behaviours)
+except Exception as e:
+    print(e)
+    behaviours = {}
+
 ML_MODEL_PARAMS = { 'max_depth': [3, 300, 30],
                'min_samples_split': [0.1, 1, 0.1],
                'min_samples_leaf': [0.1, 0.5, 0.1]}
@@ -188,10 +196,10 @@ try:
                 db.insert_record_into_table(table_name, data)
             
             elif 'model/' in str(message.topic):
-                device_name, table_name = str(message.topic).replace('model/', '').split('/')
+                table_name, device_name = str(message.topic).replace('model/', '').split('/')
                 data_from_topic = str(message.payload.decode()).split(' ')
-                train = data_from_topic[2]
-                use = data_from_topic[3]
+                train = data_from_topic[0]
+                use = data_from_topic[1]
                 db.query_db('UPDATE models Set trainable = "' + train + '" , use = "' + use + '" WHERE device_name = "' + device_name + '" AND table_name = "' + table_name + '";', database_name = 'ml.db')
 
         except Exception as e:
