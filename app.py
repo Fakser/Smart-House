@@ -134,8 +134,8 @@ def train_clustering():
     data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
     data_preprocessor = DataPreprocessor(data)
     X, _ = data_preprocessor.time_series(time_series_size=TIME_SERIES_SIZE, forecast=None)
-    model = K_MEAN.model(X_train = X.to_numpy(), n_clusters=N_CLUSTERS)
-    model.fit(500, verbose = 0)
+    model = K_MEAN.Model(X_train = X.to_numpy(), n_clusters=N_CLUSTERS)
+    model.fit(epochs = 500, verbose = 0)
     behaviours = {'n_clusters': N_CLUSTERS, 'model': model, 'columns': X.columns}
     with open('./models/behaviours', 'wb') as behaviours_file:
         pickle.dump(behaviours, behaviours_file)
