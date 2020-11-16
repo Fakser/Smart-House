@@ -132,7 +132,7 @@ job_train_models = cron.add_job(train_all_models, 'interval', hours = MODEL_LEAR
 # SCHEDULED TASK TRAIN CLUSTERING
 def train_clustering():
     data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
-    data_preprocessor = DataPreprocessor(data, standarization_rule=standarization_rule)
+    data_preprocessor = DataPreprocessor(data)
     X, _ = data_preprocessor.time_series(time_series_size=TIME_SERIES_SIZE, forecast=None)
     model = K_MEANS.model(X_train = X.to_numpy(), n_clusters=N_CLUSTERS)
     model.fit(500, verbose = 0)
