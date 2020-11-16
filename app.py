@@ -184,7 +184,7 @@ try:
                     print('created table ' + table_name)
                     for column in columns:
                         if 'device' in column:
-                            db.query_db('INSERT INTO models (device_name, table_name, trainable, use) VALUES ("' + column + '","' + table_name + '", "false", "false");', database_name = 'ml.db')
+                            db.query_db('INSERT INTO models (device_name, table_name, trainable, use) VALUES ("' + column + '","' + table_name + '", "false", "false");', database_name = 'ml.db') # UPDATE a nie INSERT
                 db.insert_record_into_table(table_name, data)
             
             elif 'model/' in str(message.topic):
@@ -193,7 +193,7 @@ try:
                 table_name = data_from_topic[1]
                 train = data_from_topic[2]
                 use = data_from_topic[3]
-                db.query_db('INSERT INTO models (trainable, use) VALUES ("' + train +'", "'+ use +'") WHERE device_name == "' + device_name + '" AND table_name == "' + table_name + '";', database_name = 'ml.db')
+                db.query_db('UPDATE models Set trainable = ' + train +' , use '+ use + ' WHERE device_name = "' + device_name + '" AND table_name = "' + table_name + '";', database_name = 'ml.db')
 
         except Exception as e:
             print(str(e))    
