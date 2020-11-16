@@ -99,7 +99,7 @@ def use_all_models():
             prediction =  ml_models[device_name + '_' + table_name]['model'].predict(X)[0]
             print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, prediction))
             if mqtt:
-                mqtt.publish('control/{}/{}'.format(table_name, device_name), string(prediction))
+                mqtt.publish('control/{}/{}'.format(table_name, device_name), str(prediction))
             
 
 job_use_models = cron.add_job(use_all_models, 'interval', minutes = MODEL_USAGE_INTERVAL)
