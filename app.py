@@ -100,6 +100,7 @@ def use_all_models():
             print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, prediction))
             if mqtt:
                 mqtt.publish('control/{}/{}'.format(table_name, device_name), str(prediction))
+                print('topic: {}, prediction: {}'.format('control/{}/{}'.format(table_name, device_name), str(prediction)))
             
 
 job_use_models = cron.add_job(use_all_models, 'interval', minutes = MODEL_USAGE_INTERVAL)
@@ -211,7 +212,7 @@ try:
                     print('created table ' + table_name)
                     for column in columns:
                         if 'device' in column:
-                            db.query_db('INSERT INTO models (device_name, table_name, trainable, use) VALUES ("' + column + '","' + table_name + '", "false", "false");', database_name = 'ml.db') # UPDATE a nie INSERT
+                            db.query_db('INSERT INTO models (device_name, table_name, trainable, use) VALUES ("' + column + '","' + table_name + '", "false", "false");', database_name = 'ml.db') 
                 db.insert_record_into_table(table_name, data)
             
             elif 'model/' in str(message.topic):
