@@ -7,12 +7,15 @@ from copy import deepcopy
 import json
 import os
 from apscheduler.schedulers.background import BackgroundScheduler
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from matplotlib.pyplot import figure, close
 import atexit
 from AutoML.AutoML import AutoTuningHyperparameters, DataPreprocessor
 from Clustering import K_MEAN
 from requests import get
 import pickle
+import io
+
 
 from sklearn.metrics import fbeta_score, balanced_accuracy_score
 

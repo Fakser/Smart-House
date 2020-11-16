@@ -146,6 +146,7 @@ job_train_clustering = cron.add_job(train_clustering, 'interval', hours = MODEL_
 
 atexit.register(lambda: cron.shutdown(wait=False))
 
+####### endpoint data/ #########
 
 @app.route('/data/<token>', methods = ['GET'])
 def get_data(token):
@@ -182,6 +183,40 @@ def delete_table(name, token):
         return str(message), "500"
     return "Success", "200"
 
+####### endpoint rules/ #########
+
+@app.route('/rules/<token>', methods = ['GET'])
+def get_models_names(token):
+    if token != api_token:
+        return "unathorized connection"
+    
+    models_names = list(ml_models.keys())
+
+    return str(json.dumps(models_names)), "200"
+
+@app.route('/rules/<name>/<token>', methods = ['GET'])
+def get_model(name, token):
+    if token != api_token:
+        return "unathorized connection"
+    
+    try:
+        model = ml_models[name]
+    except:
+        return "model not found", "404"
+
+    buffer = io.BytesIO()
+    fig = figure(figsize=(6,3), dpi=300)
+    feature_names = []
+    for i in range(TIME_SERIES_SIZE):
+        feature_names += [feature_name + '_' + str(i) for feature_name in list(model['standarization matrix'].columns)]
+    viz = plot_tree(model['model'], feature_names=feature_names, filled=True, class_names=["ON", "OFF"])
+    fig.savefig(buffer)
+    close(fig)
+    viz = buffer.getvalue().decode('ISO-8859-1')
+    model = {'model_graph': viz, 'score': model['score'],
+            'features': {'names': list(model['standarization matrix'].columns), 
+                        'standarized': model['standarization matrix'].values.tolist()}}
+    return json.dumps(model), "200"
 
 # starting mqtt server
 try:
