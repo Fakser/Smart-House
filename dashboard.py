@@ -20,15 +20,14 @@ if select_viz == 'Data':
     data = get('http://localhost:5000/data/8000/{}'.format(api_token)).json()
     data_dfs = {key: pd.DataFrame(data[key]) for key in list(dict(data).keys())}
     select_table = st.sidebar.selectbox('Table: ', list(dict(data).keys()), key='1')
-    #if not st.sidebar.checkbox("Hide", True, key='1'):
     select_column = st.sidebar.selectbox('Column: ', data_dfs[select_table].columns[1:], key='3')
-    #if not st.sidebar.checkbox("Hide", True, key='4'):
-    select_chart = st.sidebar.selectbox('Chart type: ', ['linear', 'histogram'], key='5')
-    if select_chart == 'linear':
-        fig = px.line(data_dfs[select_table], x='date', y=select_column)
-    else:
-        fig = px.histogram(data_dfs[select_table], x = select_column)
-    st.plotly_chart(fig)
+    
+    st.markdown('Linear plot')
+    fig1 = px.line(data_dfs[select_table], x='date', y=select_column)
+    st.plotly_chart(fig1)
+    st.markdown('Histogram')
+    fig2 = px.histogram(data_dfs[select_table], x = select_column)
+    st.plotly_chart(fig2)
 elif select_viz == 'ML Models':
     models_names = get('http://localhost:5000/rules/{}'.format(api_token)).json()
     select_model = st.sidebar.selectbox('Model: ', list(models_names), key='2')
