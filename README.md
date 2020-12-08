@@ -1,3 +1,13 @@
+# Table of contnents
+ - [Description](#description)
+   * [Data Warehouse](#data-warehouse)
+   * [Server](#server)
+   * [Unsupervised Machine Learning](#unsupervised-machine-learning)
+   * [AutoML and Rule Induction](#automl-and-rule-induction)
+   
+ - [Requierments and Basic Usage](#requierments)
+
+
 # Description
 ![smart-house](./to_readme/smart-house.jpg)<br>
 This project is my so-called bachelors. It is about creating system 

@@ -9,8 +9,6 @@ I've prepaired myself for all possibilites.
 Idea behing my bachelors is based on analysing IOT smart-house data to get some insight on
 household members behaviour.<br>
 
-![meme1](./to_readme/070.png)<br>
-
 But how, what does it even mean.
 
 Easy.
