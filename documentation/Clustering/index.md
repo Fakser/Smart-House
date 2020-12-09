@@ -2,7 +2,7 @@
 
 > Auto-generated documentation for [Clustering](..\..\Clustering\__init__.py) module.
 
-- [Smart-house-rest-api](..\README.md#description) / [Modules](..\MODULES.md#smart-house-rest-api-modules) / Multidimensional-Clustering
+- [Smart-house-rest-api](..\README.md#table-of-contents) / [Modules](..\MODULES.md#smart-house-rest-api-modules) / Multidimensional-Clustering
     - [What's this about](#whats-this-about)
     - [CLUSTERING ALGORITHM](#clustering-algorithm)
 - [Horny to jail](#horny-to-jail)
@@ -22,8 +22,6 @@ I've prepaired myself for all possibilites.
 
 Idea behing my bachelors is based on analysing IOT smart-house data to get some insight on
 household members behaviour.<br>
-
-![meme1](./to_readme/070.png)<br>
 
 But how, what does it even mean.
 

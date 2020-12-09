@@ -6,14 +6,15 @@ class DataPreprocessor(object):
 
     @staticmethod
     def standarize(X, standarization_rule = 'sensor'):
-        """static method used for data standarization
+        """
+        static method used for data standarization
 
         Args:
-            X (pandas.DataFare): whole data in the form of DataFrame
+            X (pandas.DataFare): whole data in the form of DataFrame.
             standarization_rule (str, optional): Columns which will be standarized. Defaults to 'sensor'.
 
         Returns:
-            pandas.DataFrame: standarized DataFrame
+            pandas.DataFrame: standarized DataFrame.
         """
         data = deepcopy(X.replace(['nan'], 0))
         standarization_matrix = pd.DataFrame(np.zeros((2, len(data.columns))), index = ['std', 'mean'], columns=data.columns)
@@ -28,7 +29,8 @@ class DataPreprocessor(object):
         return data, standarization_matrix
 
     def __init__(self, data, standarization_rule = 'sensor', tolerance=pd.Timedelta('5s'), nan_value = -1, numerical_date = True):
-        """init function of class DataProcessor
+        """
+        init function of class DataProcessor
 
         Args:
             data (dict): raw data taken from http request
@@ -60,7 +62,8 @@ class DataPreprocessor(object):
         self.standarization_matrix = standarization_matrix
 
     def time_series(self, time_series_size = 3, forecast = 1, y_rule = 'device'):
-        """Method of class DataProcessor that returns padded time series 
+        """
+        Method of class DataProcessor that returns padded time series 
 
         Args:
             time_series_size (int, optional): parameter used for determining how many rows represent one data point. Defaults to 3.
@@ -68,7 +71,7 @@ class DataPreprocessor(object):
             y_rule (str, optional): name of columns which will be our target. Defaults to 'device'.
 
         Returns:
-            tuple: tuple of two dataframes, first one representing X (model input), second one Y (target)
+            tuple: tuple of two dataframes, first one representing X (model input), second one Y (target).
         """
         data_dfs  = [deepcopy(self.data_df.iloc[i:-time_series_size + i].drop('date', axis = 1).reset_index(drop = True)) for i in reversed(range(time_series_size))]
         for df_index in range(len(data_dfs)):
@@ -86,13 +89,14 @@ class DataPreprocessor(object):
 class AutoTuningHyperparameters(object):
     @staticmethod
     def generate_all_possible_params(params):
-        """static method generationg all possible combinations of parameters.
+        """
+        Static method generationg all possible combinations of parameters.
 
         Args:
-            params (dict): dictionary representing each parameter in the form: {'parameter name': [min value, max value, step]}
+            params (dict): dictionary representing each parameter in the form: {'parameter name': [min value, max value, step]}.
 
         Returns:
-            dict: all possible params
+            dict: all possible params.
         """
         params_unpacked = {key: list(np.arange(params[key][0], params[key][1] + params[key][2], params[key][2])) for key in                     params.keys()}
         keys, values = zip(*params_unpacked.items())
@@ -100,17 +104,18 @@ class AutoTuningHyperparameters(object):
         return possible_params
 
     def __init__(self, model, data, params, cost, time_series_size = 3, forecast = 3, standarization_rule = 'sensor', y_rule = 'device_blinds'):
-        """[summary]
+        """
+        Initialization of AutoTuningHyperparameters object. 
 
         Args:
-            model ([type]): [description]
-            data ([type]): [description]
-            params ([type]): [description]
-            cost ([type]): [description]
-            time_series_size (int, optional): [description]. Defaults to 3.
-            forecast (int, optional): [description]. Defaults to 3.
-            standarization_rule (str, optional): [description]. Defaults to 'sensor'.
-            y_rule (str, optional): [description]. Defaults to 'device_blinds'.
+            model (object): Model that will be optimized. EX. xgboost classifier.
+            data (object): Whole dataset in the form of pandas dataframe. It will be splitted into train and test dataset.
+            params (dict): Search space for the ml algorithm.
+            cost (function): Cost function for the model, higher value means metter model (maximization).
+            time_series_size (int, optional): Size of the time series. Defaults to 3.
+            forecast (int, optional): How many records into the future should model look. Defaults to 3.
+            standarization_rule (str, optional): Column name (partial) in the dataset that will be standatized. Defaults to 'sensor'.
+            y_rule (str, optional): Column name that wil be predicted. Defaults to 'device_blinds'.
         """
         self.model = model 
         self.data_preprocessor = DataPreprocessor(data, standarization_rule=standarization_rule)
@@ -124,13 +129,14 @@ class AutoTuningHyperparameters(object):
         self.best_model = None
     
     def fit_model(self, params):
-        """[summary]
+        """
+        Methods that fits provided ml model on given hyperparameters from the search space, and returns it withm its score.
 
         Args:
-            params ([type]): [description]
+            params (dicr): hyperparameters of the model.
 
         Returns:
-            [type]: [description]
+            tuple: object and its score on the test dataset.
         """
         model = self.model(**params)
         try:
@@ -142,14 +148,15 @@ class AutoTuningHyperparameters(object):
             return None, 0
     
     def grid_search(self, params = None, verbose = 1):
-        """[summary]
+        """
+        Grid search algorithm on the provided search space.
 
         Args:
-            params ([type], optional): [description]. Defaults to None.
-            verbose (int, optional): [description]. Defaults to 1.
+            params (dict, optional): Search space for the algorithm. Defaults to None.
+            verbose (int, optional): Parameter defining if anything should be printed to the console. verbose>=1 -> yes, verobose < 1 - no. Defaults to 1.
 
         Returns:
-            [type]: [description]
+            tuple: best found parameters and score of the model trained on them
         """
         if params:
             params = self.generate_all_possible_params(params)
@@ -168,16 +175,17 @@ class AutoTuningHyperparameters(object):
         return self.best_model[0], self.best_model[1]
 
     def random_search(self, verbose = 1, group_size = 5, iterations = 20, params = None):
-        """[summary]
+        """
+        Random search algorithm on the provided search space.
 
         Args:
-            verbose (int, optional): [description]. Defaults to 1.
-            group_size (int, optional): [description]. Defaults to 5.
-            iterations (int, optional): [description]. Defaults to 20.
-            params ([type], optional): [description]. Defaults to None.
+            verbose (int, optional): Parameter defining if anything should be printed to the console. verbose>=1 -> yes, verobose < 1 - no. Defaults to 1.
+            group_size (int, optional): Number of random samples taken by the random searcj to compare. Defaults to 5.
+            iterations (int, optional): Number of algorithm iterations. Defaults to 20.
+            params ([type], optional): Search space for the algorithm. Defaults to None.
 
         Returns:
-            [type]: [description]
+            tuple: best found parameters and score of the model trained on them
         """
         if params:
             params = self.generate_all_possible_params(params)
@@ -198,21 +206,17 @@ class AutoTuningHyperparameters(object):
         self.best_model = sorted_models[-1]
         return self.best_model[0], self.best_model[1]
 
-    def genetic_search(self):
-        """[summary]
-        """
-        pass 
-
     def auto_tune_pipeline(self, pipeline = ['random', 'grid'], narrow_to = 0.2, params = None):
-        """[summary]
+        """
+        Pipleline of algorithms given by the 'pipeline' parameter. After each search, search space is narrowed by the parameter 'narrow_to' around current best model.
 
         Args:
-            pipeline (list, optional): [description]. Defaults to ['random', 'grid'].
-            narrow_to (float, optional): [description]. Defaults to 0.2.
-            params ([type], optional): [description]. Defaults to None.
+            pipeline (list, optional): List of searches that will be performed. Defaults to ['random', 'grid'].
+            narrow_to (float, optional): How much the search space should be narrowed by after each iteration. Defaults to 0.2.
+            params ([type], optional): Search space. Defaults to None.
 
         Returns:
-            [type]: [description]
+            object: best model found after all searches
         """
         if params:
             params = params
@@ -240,8 +244,7 @@ class AutoTuningHyperparameters(object):
             print('new search ranges for parameters: {}'.format(params))
 
             print('performed {} serach with max score of {} and best parameters {}'.format(search, score, best_params))
-        # model = self.model(best_params)
-        # model.fit(self.X_train, self.y_train)
+            
         return self.fit_model(best_params)  #model, score
 
 

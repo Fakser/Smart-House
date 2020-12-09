@@ -2,7 +2,7 @@
 
 > Auto-generated documentation for [controller](..\controller.py) module.
 
-- [Smart-house-rest-api](README.md#description) / [Modules](MODULES.md#smart-house-rest-api-modules) / Controller
+- [Smart-house-rest-api](README.md#table-of-contents) / [Modules](MODULES.md#smart-house-rest-api-modules) / Controller
     - [f1_score](#f1_score)
 
 ## f1_score

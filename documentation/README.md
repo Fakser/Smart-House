@@ -1,4 +1,7 @@
 # Table of contents
+
+> Auto-generated documentation index.
+
  - [Description](#description)
    * [Data Warehouse](#data-warehouse)
    * [Server](#server)
@@ -7,6 +10,14 @@
    
  - [Requierments and Basic Usage](#requierments)
 
+Full Smart-house-rest-api project documentation can be found in [Modules](MODULES.md#smart-house-rest-api-modules)
+
+- [Table of contents](#table-of-contents)
+    - [Server](#server)
+    - [Unsupervised Machine Learning](#unsupervised-machine-learning)
+    - [AutoML and rule induction](#automl-and-rule-induction)
+    - [Linux/RasberryPi](#linuxrasberrypi)
+  - [Smart-house-rest-api Modules](MODULES.md#smart-house-rest-api-modules)
 
 # Description
 ![smart-house](./to_readme/smart-house.jpg)<br>
@@ -107,10 +118,6 @@ It works as such:
 I also had an idea for genetic algorithm which chooses best parameters, but such algorithms in the case of automl tends to converge slower than random->grid search approach. <br>
 Creating my own auto ml framework may sound like an overkill, but it gave me some knowledge it the field, which (what can I say) is pretty profitable, and currently there are not so many solutions for that industrially.
 ![pic2](./to_readme/google_automl.jpg)<br>
-
-
-
-
 
 <br>
 

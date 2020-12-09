@@ -2,7 +2,7 @@
 
 > Auto-generated documentation for [Clustering.K_MEAN](..\..\Clustering\K_MEAN.py) module.
 
-- [Smart-house-rest-api](..\README.md#description) / [Modules](..\MODULES.md#smart-house-rest-api-modules) / [Multidimensional-Clustering](index.md#multidimensional-clustering) / K Mean
+- [Smart-house-rest-api](..\README.md#table-of-contents) / [Modules](..\MODULES.md#smart-house-rest-api-modules) / [Multidimensional-Clustering](index.md#multidimensional-clustering) / K Mean
     - [Model](#model)
         - [Model().\_\_centroids\_\_](#model__centroids__)
         - [Model().fit](#modelfit)

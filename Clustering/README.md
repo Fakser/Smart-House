@@ -45,16 +45,6 @@ After clustering each point to currently random cluster, new centroind is choose
 You still here?<br>
 ![epicmeme](./to_readme/90200291_2620639914924252_6426724234050928640_n.jpg)<br>
 
-Lets look at some more "real life" example. Lets say you have a folder of images on your pc, but you dont know what is on these images as this folder contains tousands of images.
-Ok, we used our clustering algorithm on them.
-
-lets look how first cluster looks like<br>
-![memerocks](./to_readme/103964390_167214814789964_8686264964842550782_n.jpg)<br>
-
-nice rocks, how about second one<br>
-
-![hentaianimegirls](./to_readme/hornytojail.png)<br>
-
 # Horny to jail
 
 ## Use cases

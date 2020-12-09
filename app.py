@@ -81,6 +81,9 @@ ML_MODEL_PARAMS = { 'max_depth': [3, 300, 30],
 
 # SCHEDULED TASK SEND 
 def use_all_models():
+    """
+        Scheduled function that uses all available ml models on the previous records from database
+    """
     devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
     data = get('http://localhost:5000/data/4/{}'.format(api_token)).json()
     for device in devices:
@@ -109,6 +112,9 @@ job_use_models = cron.add_job(use_all_models, 'interval', minutes = MODEL_USAGE_
 
 # SCHEDULED TASK TRAIN 
 def train_all_models():
+    """
+        Scheduled function that trains ml models for all available devices. 
+    """
     devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
     data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
     for device in devices:
@@ -132,6 +138,9 @@ job_train_models = cron.add_job(train_all_models, 'interval', hours = MODEL_LEAR
 
 # SCHEDULED TASK TRAIN CLUSTERING
 def train_clustering():
+    """
+        Scheduled function that fits clustering algorithm 
+    """
     data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
     data_preprocessor = DataPreprocessor(data)
     X, _ = data_preprocessor.time_series(time_series_size=TIME_SERIES_SIZE, forecast=None)
@@ -150,6 +159,16 @@ atexit.register(lambda: cron.shutdown(wait=False))
 
 @app.route('/data/<token>', methods = ['GET'])
 def get_data(token):
+    """
+    Flask app GET request that returns all data stored in the database
+    Endpoint data/    
+
+    Args:
+        token (string): API token
+
+    Returns:
+        string: jsonified database content in the form of string 
+    """
     if token != api_token:
         return "unathorized connection"
     table_names, message = db.get_list_of_table_names()
@@ -163,6 +182,18 @@ def get_data(token):
 
 @app.route('/data/<size>/<token>', methods = ['GET'])
 def get_tails(size, token):
+    """
+    Flask app GET request that returns last data stored in the database.
+    Number of records is specified by parameter size
+    Endpoint data/
+
+    Args:
+        size (string): size of returned data/numer of last records
+        token (string): API token
+
+    Returns:
+        string: jsonified database content in the form of string 
+    """
     if token != api_token:
         return "unathorized connection"
     table_names, message = db.get_list_of_table_names()
@@ -176,6 +207,17 @@ def get_tails(size, token):
 
 @app.route('/data/<name>/<token>', methods = ['DELETE'])
 def delete_table(name, token):
+    """
+    Flask app DELETE request that delets whole database table given by name
+    Endpoint data/
+
+    Args:
+        name (string): name of the database table that will be dropped
+        token (string): API token
+
+    Returns:
+        string: message
+    """
     if token != api_token:
         return "unathorized connection"
     boolean, message = db.drop_table(name)
@@ -187,6 +229,15 @@ def delete_table(name, token):
 
 @app.route('/rules/<token>', methods = ['GET'])
 def get_models_names(token):
+    """
+    Flask app GET request that returns all ml model names
+    Endpoint rules/
+    Args:
+        token (string): API token
+
+    Returns:
+        string: jsonified names of ml models in the form of string 
+    """
     if token != api_token:
         return "unathorized connection"
     
@@ -196,6 +247,16 @@ def get_models_names(token):
 
 @app.route('/rules/<name>/<token>', methods = ['GET'])
 def get_model(name, token):
+    """
+    Flask app GET request that returns parameters of a ml model given by its name
+    Endpoint rules/
+    Args:
+        name (string): name of a ml model
+        token (string): API token
+
+    Returns:
+        string: jsonified ml model in the form of string 
+    """
     if token != api_token:
         return "unathorized connection"
     
@@ -225,6 +286,17 @@ try:
 
     @mqtt.on_message()
     def handle_mqtt_message(client, userdata, message):
+        """
+        MQTT message handler. depending on the topic, performs different operations:
+         - control/ - pass
+         - data/ - adds new record to the database table given by the name in the topic 'data/<name>', if table was not found creates it. 
+                   Record data is provided in message payload 
+         - model/ - changes parameters of a ml model given by the name in the topic 'models/<name>', changable parametrs: trainable ["false", "true"], use ["false", "true"]
+        Args:
+            client (string): client of the mqtt
+            userdata (string): data on the user
+            message (object): whole message that can be unpacked into message.payload and message.topic 
+        """
         try:
             if 'control/' in str(message.topic):
                 return

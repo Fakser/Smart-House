@@ -2,7 +2,7 @@
 
 > Auto-generated documentation for [Clustering.utils](..\..\Clustering\utils.py) module.
 
-- [Smart-house-rest-api](..\README.md#description) / [Modules](..\MODULES.md#smart-house-rest-api-modules) / [Multidimensional-Clustering](index.md#multidimensional-clustering) / Utils
+- [Smart-house-rest-api](..\README.md#table-of-contents) / [Modules](..\MODULES.md#smart-house-rest-api-modules) / [Multidimensional-Clustering](index.md#multidimensional-clustering) / Utils
     - [is_iter](#is_iter)
     - [recursive_list](#recursive_list)
     - [recursive_max](#recursive_max)

@@ -2,7 +2,7 @@
 
 > Auto-generated documentation for [Clustering.losses](..\..\Clustering\losses.py) module.
 
-- [Smart-house-rest-api](..\README.md#description) / [Modules](..\MODULES.md#smart-house-rest-api-modules) / [Multidimensional-Clustering](index.md#multidimensional-clustering) / Losses
+- [Smart-house-rest-api](..\README.md#table-of-contents) / [Modules](..\MODULES.md#smart-house-rest-api-modules) / [Multidimensional-Clustering](index.md#multidimensional-clustering) / Losses
     - [geometric_distance](#geometric_distance)
 
 ## geometric_distance
