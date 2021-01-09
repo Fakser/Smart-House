@@ -316,7 +316,7 @@ try:
             message (object): whole message that can be unpacked into message.payload and message.topic 
         """
         try:
-            if 'control/' in str(message.topic):
+            if 'control/' in str(message.topic) or 'settings/' in str(message.topic):
                 return
 
             if 'data/' in str(message.topic):
@@ -340,6 +340,17 @@ try:
                             db.query_db('INSERT INTO models (device_name, table_name, trainable, use) VALUES ("' + column + '","' + table_name + '", "false", "false");', database_name = 'ml.db') 
                 db.insert_record_into_table(table_name, data)
             
+            if 'request_settings/' in str(message.topic):
+                devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
+                message = ''
+                for device in devices:
+                    device_name = device[1]
+                    table_name = device[2]
+                    trainable = device[3]
+                    use = device[4]
+                    message += device_name + ' ' + table_name + ' ' + trainable + ' ' + use + ' '
+                mqtt.publish('settings/{}'.format(message))
+
             elif 'model/' in str(message.topic):
                 table_name, device_name = str(message.topic).replace('model/', '').split('/')
                 data_from_topic = str(message.payload.decode()).split(' ')
