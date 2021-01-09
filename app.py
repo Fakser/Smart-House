@@ -85,7 +85,13 @@ def use_all_models():
         Scheduled function that uses all available ml models on the previous records from database
     """
     devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
-    data = get('http://localhost:5000/data/4/{}'.format(api_token)).json()
+    table_names, message = db.get_list_of_table_names()
+    data = {}
+    for name in table_names:
+        column_names, message = db.get_column_names(name[0])
+        data_from_table, message = db.select_tail(name[0], 4)
+        data[str(name[0])] = deepcopy([{col_name: data for col_name, data in tuple(zip(column_names, data_row))} for data_row in data_from_table])
+    # data = get('http://localhost:5000/data/4/{}'.format(api_token)).json()
     for device in devices:
         device_name = device[1]
         table_name = device[2]
@@ -116,7 +122,12 @@ def train_all_models():
         Scheduled function that trains ml models for all available devices. 
     """
     devices = db.query_db('SELECT * FROM models', database_name = 'ml.db')
-    data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
+    table_names, message = db.get_list_of_table_names()
+    data = {}
+    for name in table_names:
+        column_names, message = db.get_column_names(name[0])
+        data_from_table, message = db.select_tail(name[0], 10000)
+        data[str(name[0])] = deepcopy([{col_name: data for col_name, data in tuple(zip(column_names, data_row))} for data_row in data_from_table])
     for device in devices:
         device_name = device[1]
         table_name = device[2]
@@ -141,7 +152,13 @@ def train_clustering():
     """
         Scheduled function that fits clustering algorithm 
     """
-    data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
+    # data = get('http://localhost:5000/data/15000/{}'.format(api_token)).json()
+    table_names, message = db.get_list_of_table_names()
+    data = {}
+    for name in table_names:
+        column_names, message = db.get_column_names(name[0])
+        data_from_table, message = db.select_tail(name[0], 15000)
+        data[str(name[0])] = deepcopy([{col_name: data for col_name, data in tuple(zip(column_names, data_row))} for data_row in data_from_table])
     data_preprocessor = DataPreprocessor(data)
     X, _ = data_preprocessor.time_series(time_series_size=TIME_SERIES_SIZE, forecast=None)
     model = K_MEAN.Model(X_train = X.to_numpy(), n_clusters=N_CLUSTERS)
@@ -154,7 +171,8 @@ def train_clustering():
 job_train_clustering = cron.add_job(train_clustering, 'interval', hours = MODEL_LEARNING_INTERVAL)
 
 atexit.register(lambda: cron.shutdown(wait=False))
-
+if len(list(ml_models.keys())) == 0:
+    train_all_models()
 ####### endpoint data/ #########
 
 @app.route('/data/<token>', methods = ['GET'])
