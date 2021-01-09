@@ -106,10 +106,10 @@ def use_all_models():
                         X.loc[0, x_column] = (X.loc[0, x_column] - ml_models[device_name + '_' + table_name]['standarization matrix'].loc['mean', standarization_column])/ml_models[device_name + '_' + table_name]['standarization matrix'].loc['std', standarization_column]
                         break
             prediction =  ml_models[device_name + '_' + table_name]['model'].predict(X)[0]
-            print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, prediction))
+            print('time: {} topic: {}, device name: {}, prediction: {}'.format(time.asctime(time.localtime()), table_name, device_name, abs(prediction)))
             if mqtt:
-                mqtt.publish('control/{}/{}'.format(table_name, device_name), str(prediction))
-                print('topic: {}, prediction: {}'.format('control/{}/{}'.format(table_name, device_name), str(prediction)))
+                mqtt.publish('control/{}/{}'.format(table_name, device_name), str(abs(prediction)))
+                print('topic: {}, prediction: {}'.format('control/{}/{}'.format(table_name, device_name), str(abs(prediction))))
             
 
 job_use_models = cron.add_job(use_all_models, 'interval', minutes = MODEL_USAGE_INTERVAL)
