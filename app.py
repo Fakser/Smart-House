@@ -349,7 +349,7 @@ try:
                     trainable = device[3]
                     use = device[4]
                     message += device_name + ' ' + table_name + ' ' + trainable + ' ' + use + ' '
-                mqtt.publish('settings/{}'.format(message))
+                mqtt.publish('settings/', message)
 
             elif 'model/' in str(message.topic):
                 table_name, device_name = str(message.topic).replace('model/', '').split('/')
