@@ -98,7 +98,7 @@ def use_all_models():
         trainable = device[3]
         use = device[4]
         print(device_name, table_name, trainable, use)
-        if use == 'true' and device_name + '_' + table_name in ml_models.keys():
+        if use.lower() == 'true' and device_name + '_' + table_name in ml_models.keys():
             X, _ = DataPreprocessor(data, standarization_rule='NO STANDARIZATION').time_series(time_series_size = TIME_SERIES_SIZE, forecast = None, y_rule=device_name)
             for x_column in X.columns:
                 for standarization_column in ml_models[device_name + '_' + table_name]['standarization matrix'].columns:
@@ -134,7 +134,7 @@ def train_all_models():
         trainable = device[3]
         use = device[4]
         print(device_name, table_name, trainable, use)
-        if trainable == 'true':
+        if trainable.lower() == 'true':
             automl = AutoTuningHyperparameters(DecisionTreeClassifier, data, ML_MODEL_PARAMS, balanced_accuracy_score, time_series_size=TIME_SERIES_SIZE, forecast = 1, y_rule = device_name)
             model, score = automl.auto_tune_pipeline()
             print(score)
